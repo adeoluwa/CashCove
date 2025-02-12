@@ -1,0 +1,59 @@
+{
+  "name": "cashcove",
+  "version": "1.0.0",
+  "description": "A simplified fintech backend service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "dev:full": "concurrently \"npm run dev\" \"npm run prisma:studio\"",
+    "prisma:studio": "prisma studio",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:reset": "prisma migrate reset --force && ts-node --transpile-only prisma/seed",
+    "prisma:seed": "ts-node --transpile-only prisma/seed.ts",
+    "prisma:generate": "npx prisma generate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adeoluwa/CashCove.git"
+  },
+  "keywords": [
+    "fintech",
+    "backend",
+    "graphql",
+    "prisma",
+    "wallet"
+  ],
+  "author": "Joseph Adeoluwa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adeoluwa/CashCove/issues"
+  },
+  "homepage": "https://github.com/adeoluwa/CashCove#readme",
+  "dependencies": {
+    "@apollo/server": "^4.11.3",
+    "@prisma/client": "^6.3.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "graphql": "^16.10.0",
+    "jsonwebtoken": "^9.0.2",
+    "prisma": "^6.3.0",
+    "reflect-metadata": "^0.2.2",
+    "type-graphql": "^2.0.0-rc.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/node": "^22.13.0",
+    "concurrently": "^9.0.1",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}

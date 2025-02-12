@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String       @id @default(uuid())
+  email          String       @unique
+  password       String
+  account_number String 
+  created_at     DateTime     @default(now())
+  updated_at     DateTime     @updatedAt
+
+  // Relationships
+  wallets              Wallet[]
+  transactions         Transaction[]
+  sent_requests        MoneyRequest[]    @relation("SentRequests")
+  received_requests    MoneyRequest[]    @relation("ReceivedRequests")
+  notifications         Notification[]
+  kyc_submissions       KYC[]
+  locked_funds          LockedFunds[]
+  bank_transfer         BankTransfer[]
+
+  @@map("users")
+}
+
+model Wallet {
+  id            String      @id @default(uuid())
+  user_id       String
+  balance       Float       @default(0.0)
+  currency      String      @default("NGN")
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+
+  // Relationships
+  user          User        @relation(fields: [user_id], references: [id])
+  transactions  Transaction[]
+  locked_funds  LockedFunds[]
+
+  @@map("wallets")
+}
+
+model MoneyRequest {
+  id           String      @id @default(uuid())
+  amount       Float 
+  currency     String 
+  status       String     @default("PENDING")  // PENDING, ACCEPTED, DENIED
+  from_user_id String
+  to_user_id   String
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+
+  //Relationships
+  from_user    User       @relation("SentRequests", fields: [from_user_id], references: [id])
+  to_user      User       @relation("ReceivedRequests", fields: [to_user_id], references: [id])
+
+  @@map("money_requests")
+}
+
+model Transaction {
+  id             String     @id @default(uuid())
+  amount         Float     
+  type           String     // e,g "DEPOSIT", "WITHDRAWAL","TRANSFER","REQUEST"
+  from_user_id   String?
+  to_user_id     String?
+  from_wallet_id String?
+  to_wallet_id   String?
+  currency       String
+  created_at     DateTime   @default(now())
+
+  user           User?      @relation(fields: [from_user_id], references: [id])
+  wallet         Wallet?    @relation(fields: [from_wallet_id], references: [id])
+
+  @@map("transactions")
+}
+
+model KYC {
+  id           String     @id @default(uuid())
+  user_id      String     
+  full_name    String
+  address      String
+  id_type      String    //e.g , PASSPORT, DRIVER_LICENSE, NATIONAL_ID
+  id_number    String
+  id_photo     String    // URL to the uploaded ID photo
+  status       String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  created_at    DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  user         User      @relation(fields: [user_id], references: [id])
+
+  @@map("kyc")
+}
+
+model LockedFunds {
+  id           String     @id @default(uuid())
+  user_id      String 
+  wallet_id    String
+  amount       Float
+  currency     String
+  unlock_date  DateTime  // Date when the funds will be unlocked
+  penalty_fee  Float     @default(0.0) // Penalty fee applied for early withdrawal
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  user         User      @relation(fields: [user_id], references: [id])
+  wallet       Wallet    @relation(fields: [wallet_id], references: [id])
+
+  @@map("locked_funds")
+}
+
+model Notification {
+  id              String           @id @default(uuid())
+  user_id         String
+  message         String
+  is_read          Boolean         @default(false)
+  created_at       DateTime        @default(now())
+  updated_at       DateTime        @updatedAt
+
+  // Relationships
+  user            User             @relation(fields: [user_id], references: [id])
+
+  @@map("notifications")
+}
+
+model BankTransfer {
+  id              String           @id @default(uuid())
+  user_id         String
+  amount          Float
+  currency        String
+  recipient_bank_code      String
+  recipient_account_number String
+  reference       String           @unique
+  status          String           @default("PENDING") // PENDING, SUCCESS, FAILED
+  created_at       DateTime        @default(now())
+  updated_at       DateTime        @updatedAt
+
+  // Relationships
+  user            User            @relation(fields: [user_id], references: [id])
+}
