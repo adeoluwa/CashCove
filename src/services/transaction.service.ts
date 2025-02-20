@@ -2,15 +2,12 @@ import { TransactionRepository } from "../repositories/transaction.repository";
 import { Transaction } from "../schemas/transaction.schema";
 
 export class TransactionService {
-  private transactionRepository: TransactionRepository;
 
-  constructor() {
-    this.transactionRepository = new TransactionRepository();
-  }
+  constructor(private transactionRepository: TransactionRepository = new TransactionRepository()) {}
 
   async createTransaction(
     amount: number,
-    type: string,
+    type: "credit" | "debit",
     currency: string,
     fromUserId?: string,
     toUserId?: string,

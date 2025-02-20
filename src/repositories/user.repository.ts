@@ -21,7 +21,14 @@ export class UserRepository {
     return await prisma.user.findUnique({ where: { email } });
   }
 
-  async findUserById(id:string){
-    return await prisma.user.findUnique({where:{id}});
+  async findUserById(id: string) {
+    return await prisma.user.findUnique({ where: { id } });
+  }
+
+  async updateUserProfile(
+    id: string,
+    updates: Partial<{ address: string; phone_number: string }>
+  ) {
+    return await prisma.user.update({ where: { id }, data: updates });
   }
 }

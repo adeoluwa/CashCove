@@ -4,8 +4,11 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { ApolloServer } from "@apollo/server";
 import express from "express";
+import csurf from "csurf";
 import { buildSchema } from "type-graphql";
 import loadResolvers from "./loaders/loadResolvers";
+import { ErrorHandler } from "./utils/error-handling";
+import { GraphQLContext } from "./types";
 
 async function bootstrap() {
   try {
@@ -14,7 +17,7 @@ async function bootstrap() {
 
     // Build the GraphQL schema
     const schema = await buildSchema({
-      resolvers:resolvers as [Function, ...Function[]], // Type assertion
+      resolvers: resolvers as [Function, ...Function[]], // Type assertion
       validate: false,
     });
 
@@ -23,11 +26,16 @@ async function bootstrap() {
 
     await server.start();
 
+    app.use(ErrorHandler);
+    app.use(csurf);
+
     app.use(
       "/graphql",
       cors<cors.CorsRequest>(),
       bodyParser.json(),
-      expressMiddleware(server)
+      expressMiddleware(server, {
+        context: async ({ req }): Promise<GraphQLContext> => ({ req }),
+      })
     );
 
     app.listen({ port: 4000 }, () =>

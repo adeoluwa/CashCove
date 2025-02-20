@@ -1,39 +1,63 @@
 import { UserRepository } from "../repositories/user.repository";
 import { hashPassword, verifyPassword } from "../utils/auth";
+import isEmail from "validator/lib/isEmail";
 
 export class UserService {
-  private userRepository: UserRepository;
+  constructor(private userRepository: UserRepository = new UserRepository()) {}
 
-  constructor() {
-    this.userRepository = new UserRepository();
+  private generateAccountNumber(): string {
+    return Math.floor(1000000000 + Math.random() * 9000000000).toString();
+  }
+
+  private normalizeEmail(email: string): string {
+    return email.trim().toLowerCase(); // converts email to lowercase and removes extra spaces
   }
 
   async register(email: string, password: string) {
+    const normalizedEmail = this.normalizeEmail(email);
+
+    if (!isEmail(normalizedEmail)) throw new Error("Invalid email format");
+
+    const existingAccount = await this.userRepository.findUserByEmail(
+      normalizedEmail
+    );
+
+    if (existingAccount) throw new Error("Account already in use!");
+
     const hashedPassword = await hashPassword(password);
-    const accountNumber = Math.floor(
-      1000000000 + Math.random() * 9000000000
-    ).toString();
-
-    const existingAccount = await this.userRepository.findUserByEmail(email);
-
-    if(existingAccount) throw new Error("Account already in use!")
 
     return await this.userRepository.createUser(
-      email,
+      normalizedEmail,
       hashedPassword,
-      accountNumber
+      this.generateAccountNumber()
     );
   }
 
-  async login(email:string, password:string){
-    const user = await this.userRepository.findUserByEmail(email);
+  async login(email: string, password: string) {
+    const normalizedEmail = this.normalizeEmail(email);
+
+    const user = await this.userRepository.findUserByEmail(normalizedEmail);
+
+    if (!user) throw new Error("User not found");
+
+    if (!(await verifyPassword(password, user.password)))
+      throw new Error("Innvalid credentials");
+
+    return user;
+  }
+
+  async updateUsersProfile(
+    id: string,
+    updates: Partial<{ address: string; phone_number: string }>
+  ) {
+    // prevent updates to email and account_number
+    if ("email" in updates || "account_number" in updates)
+      throw new Error("Email and account number cannot be updated");
+
+    const user = await this.userRepository.findUserById(id);
 
     if(!user) throw new Error("User not found");
 
-    const validPassword = await verifyPassword(password, user.password);
-
-    if(!validPassword) throw new Error("Invalid credentials");
-
-    return user;
+    return this.userRepository.updateUserProfile(id, updates)
   }
 }

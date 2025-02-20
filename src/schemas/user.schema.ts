@@ -12,6 +12,12 @@ export class User {
   @Field()
   account_number!: string;
 
+  @Field(() =>String,{ nullable: true })
+  address!: string | null;
+
+  @Field(() => String, { nullable: true })
+  phone_number!: string | null;
+
   @Field(() => Date)
   created_at: Date | undefined;
 }
@@ -32,4 +38,13 @@ export class LoginInput {
 
   @Field()
   password!: string;
+}
+
+@InputType()
+export class UpdateProfileInput {
+  @Field({ nullable: true })
+  address?: string;
+
+  @Field({ nullable: true })
+  phone_number?: string;
 }

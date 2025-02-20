@@ -9,7 +9,7 @@ export default class TransactionResolver {
   @Mutation(() => Transaction)
   async createTransaction(
     @Arg("amount") amount: number,
-    @Arg("type") type: string,
+    @Arg("type") type: "credit" | "debit",
     @Arg("currency") currency: string,
     @Arg("fromUserId", { nullable: true }) fromUserId?: string,
     @Arg("toUserId", { nullable: true }) toUserId?: string,
