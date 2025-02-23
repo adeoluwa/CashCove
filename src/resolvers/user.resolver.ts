@@ -9,7 +9,8 @@ import {
 } from "../schemas/user.schema";
 import { generateToken } from "../utils/auth";
 import { info } from "../utils/logger";
-import { GraphQLContext } from "../types";
+// import { GraphQLContext } from "../types";
+import { CurrentUser } from "../middleware/currentUser";
 
 const userService = new UserService();
 
@@ -44,16 +45,9 @@ export default class UserResolver {
 
   @Mutation(() => User)
   async updateProfile(
-    @Arg("input") input: UpdateProfileInput,
-    @Ctx() cxt: GraphQLContext
+    @CurrentUser() userId:string,
+    @Arg("input") input: UpdateProfileInput
   ): Promise<User> {
-    const userId = cxt.user?.userId;
-    console.log("Logged In user:", userId )
-
-    if (!userId) throw new Error("Unauthorized");
-
-    info({ message: "Aurhenticated User", params: { userId } });
-
     return await userService.updateUsersProfile(userId, input);
   }
 }

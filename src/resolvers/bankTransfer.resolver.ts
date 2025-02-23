@@ -1,6 +1,7 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { BankTransfer } from "../schemas/bankTransfer.schema";
 import { BankTransferService } from "../services/bankTransfer.service";
+import { CurrentUser } from "../middleware/currentUser";
 
 const bankTransferService = new BankTransferService();
 
@@ -8,7 +9,7 @@ const bankTransferService = new BankTransferService();
 export default class BankTransferResolver {
   @Mutation(() => BankTransfer)
   async initiateBankTransafer(
-    @Arg("userId") userId: string,
+    @CurrentUser() userId: string,
     @Arg("amount") amount: number,
     @Arg("currency") currency: string,
     @Arg("recipientBankCode") recipientBankCode: string,
@@ -29,7 +30,7 @@ export default class BankTransferResolver {
   }
 
   @Query(() =>[BankTransfer])
-  async getBankTransfers(@Arg("userId") userId:string):Promise<BankTransfer[]>{
+  async getBankTransfers(@CurrentUser() userId:string):Promise<BankTransfer[]>{
     return await bankTransferService.getBankTransfers(userId)
   }
 }

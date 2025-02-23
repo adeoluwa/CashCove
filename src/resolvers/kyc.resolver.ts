@@ -1,6 +1,7 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { KYC } from "../schemas/kyc.schema";
 import { KYCService } from "../services/kyc.service";
+import { CurrentUser } from "../middleware/currentUser";
 
 const kycService = new KYCService();
 
@@ -8,7 +9,7 @@ const kycService = new KYCService();
 export default class KYCResolver {
   @Mutation(() => KYC)
   async submitKYC(
-    @Arg("userId") userId: string,
+    @CurrentUser() userId: string,
     @Arg("fullName") fullName: string,
     @Arg("address") address: string,
     @Arg("idType") idType: string,
@@ -36,7 +37,7 @@ export default class KYCResolver {
   }
 
   @Query(() => String)
-  async getKYCStatus(@Arg("userId") userId: string): Promise<string> {
+  async getKYCStatus(@CurrentUser() userId: string): Promise<string> {
     return await kycService.getKYCStatus(userId);
   }
 }

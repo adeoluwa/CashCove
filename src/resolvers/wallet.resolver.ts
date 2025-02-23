@@ -1,7 +1,7 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Wallet } from "../schemas/wallet.schema";
 import { WalletService } from "../services/wallet.service";
-import { GraphQLContext } from "../types";
+import { CurrentUser } from "../middleware/currentUser";
 
 const walletService = new WalletService();
 
@@ -9,15 +9,15 @@ const walletService = new WalletService();
 export default class WalletResolver {
   @Mutation(() => String)
   async fundWallet(
-    @Arg("userId") userId: string,
     @Arg("amount") amount: number,
-    @Arg("currency") currency: string
+    @Arg("currency") currency: string,
+    @CurrentUser() userId:string
   ): Promise<string> {
     return await walletService.fundWallet(userId, amount, currency);
   }
 
   @Query(() => [Wallet])
-  async getWallets(@Arg("userId") userId:string): Promise<Wallet[]>{
+  async getWallets(@CurrentUser() userId:string): Promise<Wallet[]>{
     return await walletService.getWallets(userId);
   }
 }

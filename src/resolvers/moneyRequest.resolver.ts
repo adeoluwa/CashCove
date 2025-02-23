@@ -1,8 +1,10 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { MoneyRequest } from "../schemas/moneyRequest.schema";
 import { MoneyRequestService } from "../services/moneyRequest.service";
+import { CurrentUser } from "../middleware/currentUser";
 
 const moneyRequestService = new MoneyRequestService();
+// TODO: Replace fromuserId with the current logged in user making the request.
 
 @Resolver()
 export default class MoneyRequestResolver {

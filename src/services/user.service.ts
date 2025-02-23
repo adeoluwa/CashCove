@@ -1,7 +1,6 @@
 import { UserRepository } from "../repositories/user.repository";
 import { hashPassword, verifyPassword } from "../utils/auth";
 import isEmail from "validator/lib/isEmail";
-import { info } from "../utils/logger";
 
 export class UserService {
   constructor(private userRepository: UserRepository = new UserRepository()) {}
@@ -58,15 +57,12 @@ export class UserService {
     id: string,
     updates: Partial<{ address: string; phone_number: string }>
   ) {
-    console.log("Heyyyyy")
 
     // prevent updates to email and account_number
     if ("email" in updates || "account_number" in updates)
       throw new Error("Email and account number cannot be updated");
 
     const user = await this.userRepository.findUserById(id);
-
-    // info({message:"User:", params:{user}})
 
     if (!user) throw new Error("User not found");
 

@@ -1,6 +1,7 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Mutation, Query, Resolver, Ctx } from "type-graphql";
 import { LockedFunds } from "../schemas/lockedFund.schema";
 import { LockedFundService } from "../services/lockedFund.service";
+import { GraphQLContext } from "../types";
 
 const lockedFundService = new LockedFundService();
 
@@ -8,12 +9,14 @@ const lockedFundService = new LockedFundService();
 export default class LockedFundResolver {
   @Mutation(() => LockedFunds)
   async lockFunds(
-    @Arg("userId") userId: string,
+    // @Arg("userId") userId: string,
     @Arg("walletId") walletId: string,
     @Arg("amount") amount: number,
     @Arg("currency") currency: string,
-    @Arg("unlockDate") unlockDate: Date
+    @Arg("unlockDate") unlockDate: Date,
+    @Ctx() ctx: GraphQLContext
   ): Promise<LockedFunds> {
+    const userId = ctx.user?.userId;
     return await lockedFundService.lockFunds(
       userId,
       walletId,
@@ -24,7 +27,8 @@ export default class LockedFundResolver {
   }
 
   @Mutation(() => String)
-  async unlockFunds(@Arg("userId") userId: string): Promise<string> {
+  async unlockFunds(@Ctx() ctx: GraphQLContext): Promise<string> {
+    const userId = ctx.user?.userId;
     await lockedFundService.unlockFunds(userId);
     return "Funds unlocked successfully";
   }
@@ -34,7 +38,10 @@ export default class LockedFundResolver {
     @Arg("userId") userId: string,
     @Arg("lockedFundId") lockedFundId: string
   ): Promise<string> {
-    const result = await lockedFundService.earlyWithdrawal(userId, lockedFundId);
+    const result = await lockedFundService.earlyWithdrawal(
+      userId,
+      lockedFundId
+    );
     return `Withdrawal successful. Amount after penalty: ${result.amountAfterPenalty}, Penalty fee: ${result.penaltyFee}`;
   }
 
