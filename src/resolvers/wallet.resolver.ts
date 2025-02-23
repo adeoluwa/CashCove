@@ -1,6 +1,7 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { Wallet } from "../schemas/wallet.schema";
 import { WalletService } from "../services/wallet.service";
+import { GraphQLContext } from "../types";
 
 const walletService = new WalletService();
 

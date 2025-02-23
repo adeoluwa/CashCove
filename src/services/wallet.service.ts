@@ -2,26 +2,22 @@ import { WalletRespository } from "../repositories/wallet.repository";
 import { KYCService } from "./kyc.service";
 import { TransactionService } from "./transaction.service";
 import { NotificationService } from "./notification.service";
+import { AppError } from "../middleware/errorHandler";
 
 export class WalletService {
-  private walletRepository: WalletRespository;
-  private kycService: KYCService;
-  private notificationService: NotificationService;
-  private transactionService: TransactionService;
-
-  constructor() {
-    this.walletRepository = new WalletRespository();
-    this.kycService = new KYCService();
-    this.notificationService = new NotificationService();
-    this.transactionService = new TransactionService();
-  }
+  constructor(
+    private walletRepository: WalletRespository = new WalletRespository(),
+    private kycService: KYCService = new KYCService(),
+    private notificationService: NotificationService = new NotificationService(),
+    private transactionService: TransactionService = new TransactionService()
+  ) {}
 
   async fundWallet(userId: string, amount: number, currency: string) {
     const kycStatus = await this.kycService.getKYCStatus(userId);
 
     if (kycStatus !== "APPROVED") {
-      throw new Error(
-        "KYC not approved. Please complete KYC to perform transaction."
+      throw new AppError(
+        "Transaction declinded: KYC verification is required to proceed.", 403,"Please complete your KYC verification to enable wallet transaction"
       );
     }
 
@@ -55,6 +51,6 @@ export class WalletService {
   }
 
   async getWallets(userId: string) {
-    return await this.walletRepository.getWalletsByUserId(userId);
+    return this.walletRepository.getWalletsByUserId(userId);
   }
 }

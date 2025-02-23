@@ -1,6 +1,7 @@
 import { UserRepository } from "../repositories/user.repository";
 import { hashPassword, verifyPassword } from "../utils/auth";
 import isEmail from "validator/lib/isEmail";
+import { info } from "../utils/logger";
 
 export class UserService {
   constructor(private userRepository: UserRepository = new UserRepository()) {}
@@ -41,23 +42,34 @@ export class UserService {
     if (!user) throw new Error("User not found");
 
     if (!(await verifyPassword(password, user.password)))
-      throw new Error("Innvalid credentials");
+      throw new Error("Invalid credentials");
 
-    return user;
+    console.log("Authenticated user:", user);
+
+    return {
+      id: user.id,
+      email: user.email,
+      account_number: user.account_number,
+      phone_number: user.phone_number,
+    };
   }
 
   async updateUsersProfile(
     id: string,
     updates: Partial<{ address: string; phone_number: string }>
   ) {
+    console.log("Heyyyyy")
+
     // prevent updates to email and account_number
     if ("email" in updates || "account_number" in updates)
       throw new Error("Email and account number cannot be updated");
 
     const user = await this.userRepository.findUserById(id);
 
-    if(!user) throw new Error("User not found");
+    // info({message:"User:", params:{user}})
 
-    return this.userRepository.updateUserProfile(id, updates)
+    if (!user) throw new Error("User not found");
+
+    return this.userRepository.updateUserProfile(id, updates);
   }
 }
