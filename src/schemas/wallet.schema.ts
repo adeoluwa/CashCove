@@ -16,4 +16,7 @@ export class Wallet {
 
   @Field(() => Date)
   created_at: Date | undefined;
+
+  @Field(() => Date)
+  updated_at!: Date;
 }

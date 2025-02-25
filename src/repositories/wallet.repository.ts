@@ -1,3 +1,4 @@
+import { Wallet } from "@prisma/client";
 import prisma from "../utils/prisma";
 
 export class WalletRespository {
@@ -7,11 +8,20 @@ export class WalletRespository {
     });
   }
 
-  async updateWalletBalance(walletId: string, amount: number) {
-    return await prisma.wallet.update({
-      where: { id: walletId },
-      data: { balance: { increment: amount } },
-    });
+  async updateWalletBalance(walletId: string, amount: number):Promise<Wallet> {
+    try {
+      const updatedWallet = await prisma.wallet.update({
+        where: { id: walletId },
+        data: { balance: { increment: amount } },
+      });
+
+      console.log("Updated Wallet:", updatedWallet);
+
+      return updatedWallet;
+    } catch (error) {
+      console.error("Error in updateWalletBalance:", error);
+      throw new Error("Failed to update wallet balance")
+    }
   }
 
   async getWalletsByUserId(userId: string) {

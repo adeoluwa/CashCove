@@ -50,6 +50,8 @@ export class UserService {
       email: user.email,
       account_number: user.account_number,
       phone_number: user.phone_number,
+      address:user.address,
+      created_at:user.created_at
     };
   }
 

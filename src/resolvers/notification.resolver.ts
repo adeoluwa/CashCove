@@ -1,6 +1,7 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { Notification } from "../schemas/notification.schema";
 import { NotificationService } from "../services/notification.service";
+import { CurrentUser } from "../middleware/currentUser";
 
 const notificationService = new NotificationService();
 
@@ -16,7 +17,7 @@ export default class NotificationResolver {
 
   @Query(() => [Notification])
   async getNotifications(
-    @Arg("userId") userId: string
+    @CurrentUser() userId: string
   ): Promise<Notification[]> {
     return await notificationService.getNotifications(userId);
   }

@@ -8,7 +8,7 @@ import { buildSchema } from "type-graphql";
 import loadResolvers from "./loaders/loadResolvers";
 import { GraphQLContext } from "./types";
 import { authMiddleware } from "./middleware/authMiddleware";
-import {AppError, errorHandler, ERROR_MAP} from "./middleware/errorHandler"
+import { AppError, errorHandler, ERROR_MAP } from "./middleware/errorHandler";
 
 async function bootstrap() {
   try {
@@ -21,26 +21,35 @@ async function bootstrap() {
       validate: false,
 
       // Ensure the user is authenticated
-      authChecker:({context}) => {
-        return !!context.user
-      }
+      authChecker: ({ context }) => {
+        return !!context.user;
+      },
     });
 
-    const server = new ApolloServer({ schema, formatError:(err) => {
-      const originalError = err.extensions?.exception as AppError | Error;
+    const server = new ApolloServer({
+      schema,
+      formatError: (err) => {
+        console.error("GraphQL Error:", err);
 
-      if(originalError instanceof AppError){
-        return {
-          message: originalError.message,
-          statusCode: originalError.statusCode,
-          details:originalError.details
+        const originalError = err.extensions?.exception as AppError | Error;
+
+        if (originalError instanceof AppError) {
+          return {
+            message: originalError.message,
+            statusCode: originalError.statusCode,
+            details: originalError.details,
+          };
         }
-      }
 
-      const {statusCode = 500, message = "Internal Server Error"} = originalError && ERROR_MAP[originalError.name] || {}
+        // Handle generic errors
+        const errorName = originalError?.name || "InternalServerError";
 
-      return {message, statusCode}
-    } });
+        const { statusCode = 500, message = "Internal Server Error" } =
+          ERROR_MAP[errorName] || {};
+
+        return { message, statusCode };
+      },
+    });
     const app = express();
 
     await server.start();
@@ -51,21 +60,23 @@ async function bootstrap() {
       bodyParser.json(),
       expressMiddleware(server, {
         context: async ({ req }): Promise<GraphQLContext> => {
-          const context:GraphQLContext = {req};
+          const context: GraphQLContext = { req };
 
-          if(req.headers.authorization){
-
-            await authMiddleware({context} as any, async () => {})
+          try {
+            if (req.headers.authorization) {
+              await authMiddleware({ context } as any, async () => {});
+            }
+          } catch (error) {
+            console.error("Error in authMiddleware:", error);
+            throw new Error("Authentication failed");
           }
 
-          return context
+          return context;
         },
-        
       })
     );
 
     app.use(errorHandler);
-
 
     app.listen({ port: 4000 }, () =>
       console.log(`🚀 Server ready at http://localhost:4000/graphql`)

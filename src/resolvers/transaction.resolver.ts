@@ -1,6 +1,7 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { Transaction } from "../schemas/transaction.schema";
 import { TransactionService } from "../services/transaction.service";
+import { CurrentUser } from "../middleware/currentUser";
 
 const transactionService = new TransactionService();
 
@@ -35,7 +36,7 @@ export default class TransactionResolver {
   }
 
   @Query(() => [Transaction])
-  async getTransaction(@Arg("userId") userId: string): Promise<Transaction[]> {
+  async getTransaction(@CurrentUser() userId: string): Promise<Transaction[]> {
     return await transactionService.getTransactionByUserId(userId);
   }
 }

@@ -7,13 +7,19 @@ const walletService = new WalletService();
 
 @Resolver()
 export default class WalletResolver {
-  @Mutation(() => String)
+  @Mutation(() => Wallet)
   async fundWallet(
     @Arg("amount") amount: number,
     @Arg("currency") currency: string,
     @CurrentUser() userId:string
-  ): Promise<string> {
-    return await walletService.fundWallet(userId, amount, currency);
+  ): Promise<Wallet> {
+    try {
+      return await walletService.fundWallet(userId, amount, currency);
+      
+    } catch (error) {
+      console.error("Error in fundWallet resolver:", error)
+      throw new Error("Failed to fund wallet")
+    }
   }
 
   @Query(() => [Wallet])

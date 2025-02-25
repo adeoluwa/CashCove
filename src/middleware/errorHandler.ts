@@ -15,7 +15,10 @@ export class AppError extends Error {
   }
 }
 
-export const ERROR_MAP: Record<string, { statusCode: number; message: string }> = {
+export const ERROR_MAP: Record<
+  string,
+  { statusCode: number; message: string }
+> = {
   ValidationError: { statusCode: 400, message: "Invalid request data" },
   JsonWebTokenError: {
     statusCode: 401,
@@ -29,6 +32,10 @@ export const ERROR_MAP: Record<string, { statusCode: number; message: string }> 
     statusCode: 500,
     message: "A database error occured.",
   },
+  UnauthorizedError: { statusCode: 401, message: "Unauthorized" },
+  ForbiddenError: { statusCode: 403, message: "Forbidden" },
+  NotFoundError: { statusCode: 404, message: "Not Found" },
+  InternalServerError: { statusCode: 500, message: "Internal Server Error" },
 };
 
 export const errorHandler = (
@@ -37,24 +44,29 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  let statusCode = 500;
-  let message = "Internal Server Error";
-  let details: string | undefined = undefined;
+  // let statusCode = 500;
+  // let message = "Internal Server Error";
+  // let details: string | undefined = undefined;
+  console.error("Error:", err);
 
+  // if (err instanceof AppError) {
+  //   statusCode = err.statusCode;
+  //   message = err.message;
+  //   details = err.details;
+  // } else if (ERROR_MAP[err.name]) {
+  //   ({ statusCode, message } = ERROR_MAP[err.name]);
+  //   details = err.message;
+  // }
   if (err instanceof AppError) {
-    statusCode = err.statusCode;
-    message = err.message;
-    details = err.details;
-  } else if (ERROR_MAP[err.name]) {
-    ({ statusCode, message } = ERROR_MAP[err.name]);
-    details = err.message;
+    return res.status(err.statusCode).json({
+      message: err.message,
+      details: err.details,
+    });
   }
 
-  console.error({ status: statusCode, message, details, stack: err.stack });
+  // console.error({ status: statusCode, message, details, stack: err.stack });
 
-  res.status(statusCode).json({
-    status: statusCode < 500 ? "fail" : "error",
-    message,
-    ...(details && { details }),
+  res.status(500).json({
+    message: "Internal Server Error",
   });
 };

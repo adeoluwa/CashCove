@@ -31,4 +31,8 @@ export class UserRepository {
   ) {
     return await prisma.user.update({ where: { id }, data: updates });
   }
+
+  async deleteUser(id:string){
+    return await prisma.user.delete({where:{id}})
+  }
 }

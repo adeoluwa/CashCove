@@ -39,6 +39,7 @@ export default class UserResolver {
         email: user.email,
         account_number: user.account_number,
         phone_number: user.phone_number,
+        address:user.address,
       },
     };
   }
