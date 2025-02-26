@@ -9,6 +9,7 @@ import loadResolvers from "./loaders/loadResolvers";
 import { GraphQLContext } from "./types";
 import { authMiddleware } from "./middleware/authMiddleware";
 import { AppError, errorHandler, ERROR_MAP } from "./middleware/errorHandler";
+import { VercelRequest, VercelResponse } from "@vercel/node";
 
 async function bootstrap() {
   try {
@@ -77,6 +78,9 @@ async function bootstrap() {
     );
 
     app.use(errorHandler);
+
+    // Export the app for vercel
+    module.exports = app;
 
     app.listen({ port: 4000 }, () =>
       console.log(`🚀 Server ready at http://localhost:4000/graphql`)
