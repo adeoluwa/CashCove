@@ -16,18 +16,13 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
 
       - name: Build project
         run: npm run build
-
-      - name: Deploy to Railway
-        run: |
-         railway login --ci --token ${{ secrets.RAILWAY_TOKEN }}
-         railway up
 
       - name: Deploy to Vercel
         run: |
