@@ -10,6 +10,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserState {
+  ACTIVE
+  SUSPENDED
+}
+
 model User {
   id             String       @id @default(uuid())
   email          String       @unique
@@ -29,6 +34,9 @@ model User {
   kyc_submissions       KYC[]
   locked_funds          LockedFunds[]
   bank_transfer         BankTransfer[]
+
+  // actions
+  state           UserState @default(ACTIVE)
 
   @@map("users")
 }

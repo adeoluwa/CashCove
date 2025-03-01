@@ -9,7 +9,6 @@ import loadResolvers from "./loaders/loadResolvers";
 import { GraphQLContext } from "./types";
 import { authMiddleware } from "./middleware/authMiddleware";
 import { AppError, errorHandler, ERROR_MAP } from "./middleware/errorHandler";
-import { VercelRequest, VercelResponse } from "@vercel/node";
 
 async function bootstrap() {
   try {
