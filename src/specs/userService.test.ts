@@ -9,6 +9,11 @@ describe("UserService", () => {
   let userService: UserService;
   let userRepository: jest.Mocked<UserRepository>;
 
+  enum mockUserState  {
+    ACTIVE = "ACTIVE",
+    SUSPENDED = "SUSPENDED"
+  }
+
   const mockUser = {
     id:"1",
     email:"test@example.com",
@@ -16,6 +21,7 @@ describe("UserService", () => {
     phone_number:"08082989696",
     address:"Molarere Moniya, Ibadan",
     password:"password123",
+    state:mockUserState.ACTIVE,
     created_at: new Date(),
     updated_at:new Date()
   }
