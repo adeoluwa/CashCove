@@ -1,4 +1,4 @@
-import { WalletRespository } from "../repositories/wallet.repository";
+import { WalletRepository } from "../repositories/wallet.repository";
 import { KYCService } from "./kyc.service";
 import { TransactionService } from "./transaction.service";
 import { NotificationService } from "./notification.service";
@@ -6,7 +6,7 @@ import { AppError } from "../middleware/errorHandler";
 
 export class WalletService {
   constructor(
-    private walletRepository: WalletRespository = new WalletRespository(),
+    private walletRepository: WalletRepository = new WalletRepository(),
     private kycService: KYCService = new KYCService(),
     private notificationService: NotificationService = new NotificationService(),
     private transactionService: TransactionService = new TransactionService()
@@ -28,7 +28,7 @@ export class WalletService {
         currency
       );
   
-      if (!wallet) throw new Error("Wallet not found");
+      if (!wallet) throw new AppError("Wallet not found", 404);
   
       const walletBalance = await this.walletRepository.updateWalletBalance(wallet.id, amount);
   
@@ -56,7 +56,8 @@ export class WalletService {
       return walletBalance;
     } catch (error) {
       console.error("Error funding wallet:", error)
-      throw new Error("Failed to fund wallet ")
+      if(error instanceof AppError) throw error;
+      throw new AppError("Failed to fund wallet", 500)
     }
   }
 

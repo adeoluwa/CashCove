@@ -1,13 +1,13 @@
 import { MoneyRequestRepository } from "../repositories/moneyRequest.repository";
 
-import { WalletRespository } from "../repositories/wallet.repository";
+import { WalletRepository } from "../repositories/wallet.repository";
 
 import { TransactionService } from "./transaction.service";
 import { NotificationService } from "./notification.service";
 export class MoneyRequestService {
   constructor(
     private moneyRequestRepository: MoneyRequestRepository = new MoneyRequestRepository(),
-    private walletRepository: WalletRespository = new WalletRespository(),
+    private walletRepository: WalletRepository = new WalletRepository(),
     private transactionService: TransactionService = new TransactionService(),
     private notificationService: NotificationService = new NotificationService()
   ) {}

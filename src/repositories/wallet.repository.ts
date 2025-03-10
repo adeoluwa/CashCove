@@ -1,7 +1,7 @@
 import { Wallet } from "@prisma/client";
 import prisma from "../utils/prisma";
 
-export class WalletRespository {
+export class WalletRepository {
   async findWalletByUserId(userId: string, currency: string) {
     return await prisma.wallet.findFirst({
       where: { user_id: userId, currency },

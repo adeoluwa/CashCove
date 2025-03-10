@@ -1,13 +1,13 @@
 import { LockedFundRepository } from "../repositories/lockedFund.repository";
-import { WalletRespository } from "../repositories/wallet.repository";
+import { WalletRepository } from "../repositories/wallet.repository";
 
 export class LockedFundService {
   private lockedFundRepository: LockedFundRepository;
-  private walletRepository: WalletRespository;
+  private walletRepository: WalletRepository;
 
   constructor() {
     this.lockedFundRepository = new LockedFundRepository();
-    this.walletRepository = new WalletRespository();
+    this.walletRepository = new WalletRepository();
   }
 
   async lockFunds(
